@@ -1,0 +1,1 @@
+print(len(input("What is your name?"))) #function len give the size of string inside it
