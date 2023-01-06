@@ -6,7 +6,7 @@ from Art import logo, vs
 
 def user_input():
     """This function willl take input from user and return the value of input as a result."""
-    value = input("Make a guess on city value. 'A' or 'B'").capitalize()
+    value = input("Make a guess who has more followers? 'A' or 'B'").capitalize()
     if value == "A" or value == "B":
         return value 
     else:
@@ -20,7 +20,7 @@ name = Choice['name']
 occupation = Choice['description']
 area = Choice['country']
 score = Choice["follower_count"]
-print(f"Compare {name}, a {occupation} from {area}.")
+print(f"Compare A: {name}, a {occupation} from {area}.")
 data.remove(Choice)
 
 #start of while loop
@@ -35,7 +35,7 @@ while win==True:
     Against_occupation = Against_choice['description']
     Against_area = Against_choice['country']
     Against_score = Against_choice["follower_count"]
-    print(f"Against {Against_name}, a {Against_occupation} from {Against_area}.")
+    print(f"Against B: {Against_name}, a {Against_occupation} from {Against_area}.")
     data.remove(Against_choice)
     
     #take input from the user that what they predict about the followers count of both the names
@@ -48,7 +48,7 @@ while win==True:
         occupation = Against_occupation
         score = Against_score
         area = Against_area
-        print(f"Compare {name}, a {occupation} from {area}.")
+        print(f"Compare A: {name}, a {occupation} from {area}.")
     elif guess == "B" and score<=Against_score:
         win_points +=1
         clear()
@@ -57,7 +57,7 @@ while win==True:
         occupation = Against_occupation
         score = Against_score
         area = Against_area
-        print(f"Compare {name}, a {occupation} from {area}.")
+        print(f"Compare A: {name}, a {occupation} from {area}.")
     else:
         win = False
         
