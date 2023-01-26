@@ -1,28 +1,26 @@
 from turtle import Turtle
-ALIGNMENT = "center"
-FONT = ('Arial', 16, 'normal')
 
 class ScoreBoard(Turtle):
 
     def __init__(self):
-        self.score = 0
         super().__init__()
-        self.color("white")
+        self.current_score = 0
         self.penup()
-        self.goto(0, 270)
-        self.write(arg=f"Score: {self.score}", move=False, align=ALIGNMENT, font=FONT)
         self.hideturtle()
+        self.goto(190, 230)
+        self.display()
 
-    def increase_score(self):
-        self.score += 1
+    def display(self):
         self.clear()
-        self.write(arg=f"Score: {self.score}", move=False, align=ALIGNMENT, font=FONT)
-        self.hideturtle()
+        self.write(f"current score:{self.current_score}", font=('Courier', 12, 'bold'))
+        self.winner()
 
-    def game_over(self):
-        self.clear()
-        self.goto(0, 0)
-        self.write(arg=f"Ohhoo!! Game over. Your final score is {self.score}.", move=False, align=ALIGNMENT, font=FONT)
-        self.hideturtle()
+    def give_point(self):
+        self.current_score += 1
+        self.display()
 
+    def winner(self):
+        if self.current_score == 50:
+            self.home()
+            self.write("You Win", align="center", font=('Courier', 15, 'bold'))
 
