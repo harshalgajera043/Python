@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 import random
+from json import *
 import pyperclip
 
 PASSWORD_LENGTH = 12
@@ -13,6 +14,25 @@ CAP_ALPHA_LIST = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M
 SPECIAL_CHAR_LIST = ["@", "_", "!", "#", "$", "%", "^", "&", "*", "(", ")", "<", ">", "?", "/", "!", "|", "}", "{", "~",
                      ":"]
 NUMBER_LIST = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+
+#------------------------------------- SEARCH -------------------------------------#
+
+def search():
+    search_me = website_name.get()
+
+    if len(search_me) == 0:
+        messagebox.showwarning(title="Empty website name", message="Please enter the website name to search for id/password")
+    else:
+        try:
+            with open("data.json", "r") as file:
+                company_data = load(file)[search_me]
+        except KeyError:
+            messagebox.showwarning(title="Value not found", message="Value is new for us")
+        else:
+            messagebox.showinfo(title=search_me, message=f"Email/Username:{company_data['Email/Username']}\nPassword:"
+                                                         f"{company_data['Password']}")
+
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 
 
@@ -39,7 +59,7 @@ def password_generator():
     update_password = "".join(pass_list)
     # for char in pass_list:
     #     update_password += str(char)
-    print(update_password)
+    # print(update_password)
 
     # using pyperclip package for coping to the clipboard
     pyperclip.copy(update_password)
@@ -49,11 +69,14 @@ def password_generator():
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 
-
 def website():
     web = website_name.get()
     user = email.get()
     paskey = password.get()
+    web_data = {web: {
+        "Email/Username": user,
+        "Password": paskey,
+    }}
 
     if web == "" or user == "" or paskey == "":
         if web == "":
@@ -65,16 +88,23 @@ def website():
     else:
         popup = messagebox.askokcancel(title=web, message=f"These are the credential for {web} \nuser:{email.get()}"
                                                       f"\npaskey:{password.get()}\n Should you want to save it?")
-        # print(popup)
+# giving us the option to cancel our current entry
         if popup:
-            with open("data.txt", "a") as data_file:
-                data_file.write(f"{web} | {user} | {paskey}\n")
 
-                entry_accepted_mess = messagebox.showinfo(title="New Entry Recorded", message=f"Successfully accepted {web}")
-
-            website_name.delete(0, END)
-            password.delete(0, END)
-
+            try:
+                with open("data.json", "r") as data_file:
+                    data = load(data_file)
+            except FileNotFoundError:
+                with open("data.json", "w") as data_file:
+                    dump(web_data, data_file, indent=4)
+            else:
+                data.update(web_data)
+                with open("data.json", "w") as data_file:
+                    dump(data, data_file, indent=4)
+            finally:
+                messagebox.showinfo(title="New Entry Recorded", message=f"Successfully accepted {web}")
+                website_name.delete(0, END)
+                password.delete(0, END)
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
@@ -101,29 +131,28 @@ password_label.grid(column=0, row=3)
 
 
 # text_box to get user inputs
-website_name = Entry(width=50)
-website_name.grid(column=1, row=1, columnspan=2)
+website_name = Entry(width=32)
+website_name.grid(column=1, row=1, columnspan=1)
 website_name.focus()
 
 
 email = Entry(width=50)
-email.insert(0, string="Harshalgajera65@gmail.com")
+email.insert(0, string="Harshal@gmail.com")
 email.grid(column=1, row=2, columnspan=2)
 
 
-password = Entry(width=33)  # justify=LEFT
+password = Entry(width=32)  # justify=LEFT
 password.grid(column=1, row=3)
 
 
-space = Label().grid(column=0, row=4)
+Label().grid(column=0, row=4)
 
 
 # let's create a generate password button
-generate_password = Button(text="Generate Password", width=15, bg=BLUE, font=("Arial", 7, "bold"), command=password_generator).grid(column=2, row=3)
+Button(text="Generate Password", width=15, bg=BLUE, font=("Arial", 7, "bold"), command=password_generator).grid(column=2, row=3)
 
-add_password = Button(text="Add", width=38, bg=BLUE, font=FONT, command=website).grid(column=1, row=5, columnspan=2)
+Button(text="Add", width=38, bg=BLUE, font=FONT, command=website).grid(column=1, row=5, columnspan=2)
 
+Button(text="Search", width=15, bg=BLUE, font=("Arial", 7, "bold"), command=search).grid(column=2, row=1)
 
 window.mainloop()
-
-
