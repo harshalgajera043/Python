@@ -1,86 +1,71 @@
 from tkinter import *
+import pandas
+import random
 
-#Creating a new window and configurations
+BACKGROUND_COLOR = "#B1DDC6"
+current_card = {}
+to_learn = {}
+
+try:
+    data = pandas.read_csv("data/words_to_learn.csv")
+except FileNotFoundError:
+    original_data = pandas.read_csv("data/french_words.csv")
+    print(original_data)
+    to_learn = original_data.to_dict(orient="records")
+else:
+    to_learn = data.to_dict(orient="records")
+
+
+def next_card():
+    global current_card, flip_timer
+    window.after_cancel(flip_timer)
+    current_card = random.choice(to_learn)
+    canvas.itemconfig(card_title, text="French", fill="black")
+    canvas.itemconfig(card_word, text=current_card["French"], fill="black")
+    canvas.itemconfig(card_background, image=card_front_img)
+    flip_timer = window.after(3000, func=flip_card)
+
+
+def flip_card():
+    canvas.itemconfig(card_title, text="English", fill="white")
+    canvas.itemconfig(card_word, text=current_card["English"], fill="white")
+    canvas.itemconfig(card_background, image=card_back_img)
+
+
+def is_known():
+    to_learn.remove(current_card)
+    print(len(to_learn))
+    data = pandas.DataFrame(to_learn)
+    data.to_csv("data/words_to_learn.csv", index=False)
+    next_card()
+
+
 window = Tk()
-window.title("Widget Examples")
-window.minsize(width=500, height=500)
+window.title("Flashy")
+window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
 
-#Labels
-label = Label(text="This is old text")
-label.config(text="This is new text")
-label.pack()
+flip_timer = window.after(3000, func=flip_card)
 
-#Buttons
-def action():
-    print("Do something")
+canvas = Canvas(width=800, height=526)
+card_front_img = PhotoImage(file="images/card_front.png")
+card_back_img = PhotoImage(file="images/card_back.png")
+card_background = canvas.create_image(400, 263, image=card_front_img)
+card_title = canvas.create_text(400, 150, text="", font=("Ariel", 40, "italic"))
+card_word = canvas.create_text(400, 263, text="", font=("Ariel", 60, "bold"))
+canvas.config(bg=BACKGROUND_COLOR, highlightthickness=0)
+canvas.grid(row=0, column=0, columnspan=2)
 
-#calls action() when pressed
-button = Button(text="Click Me", command=action)
-button.pack()
+cross_image = PhotoImage(file="images/wrong.png")
+unknown_button = Button(image=cross_image, highlightthickness=0, command=next_card)
+unknown_button.grid(row=1, column=0)
 
-#Entries
-entry = Entry(width=30)
-#Add some text to begin with
-entry.insert(END, string="Some text to begin with.")
-#Gets text in entry
-print(entry.get())
-entry.pack()
+check_image = PhotoImage(file="images/right.png")
+known_button = Button(image=check_image, highlightthickness=0, command=is_known)
+known_button.grid(row=1, column=1)
 
-#Text
-text = Text(height=5, width=30)
-#Puts cursor in textbox.
-text.focus()
-#Adds some text to begin with.
-text.insert(END, "Example of multi-line text entry.")
-#Get's current value in textbox at line 1, character 0
-print(text.get("1.0", END))
-text.pack()
+next_card()
 
-#Spinbox
-def spinbox_used():
-    #gets the current value in spinbox.
-    print(spinbox.get())
-spinbox = Spinbox(from_=0, to=10, width=5, command=spinbox_used)
-spinbox.pack()
-
-#Scale
-#Called with current scale value.
-def scale_used(value):
-    print(value)
-scale = Scale(from_=0, to=100, command=scale_used)
-scale.pack()
-
-#Checkbutton
-def checkbutton_used():
-    #Prints 1 if On button checked, otherwise 0.
-    print(checked_state.get())
-#variable to hold on to checked state, 0 is off, 1 is on.
-checked_state = IntVar()
-checkbutton = Checkbutton(text="Is On?", variable=checked_state, command=checkbutton_used)
-checked_state.get()
-checkbutton.pack()
-
-#Radiobutton
-def radio_used():
-    print(radio_state.get())
-#Variable to hold on to which radio button value is checked.
-radio_state = IntVar()
-radiobutton1 = Radiobutton(text="Option1", value=1, variable=radio_state, command=radio_used)
-radiobutton2 = Radiobutton(text="Option2", value=2, variable=radio_state, command=radio_used)
-radiobutton1.pack()
-radiobutton2.pack()
-
-
-#Listbox
-def listbox_used(event):
-    # Gets current selection from listbox
-    print(listbox.get(listbox.curselection()))
-
-listbox = Listbox(height=4)
-fruits = ["Apple", "Pear", "Orange", "Banana"]
-for item in fruits:
-    listbox.insert(fruits.index(item), item)
-listbox.bind("<<ListboxSelect>>", listbox_used)
-listbox.pack()
 window.mainloop()
+
+
 
