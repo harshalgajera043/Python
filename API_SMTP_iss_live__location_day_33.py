@@ -1,6 +1,7 @@
 import requests
 import datetime as dt
 from smtplib import *
+import time
 
 MY_EMAIL = "hgajera307@gmail.com"
 PASSWORD = "tgxvkoydlyledscg"
@@ -54,14 +55,18 @@ current_hour = today_time.hour
 iss_position = requests.get("http://api.open-notify.org/iss-now.json")
 iss_pos_data = iss_position.json()
 # print(iss_pos_data)
-iss_long = iss_pos_data["iss_position"]["longitude"]
-iss_lan = iss_pos_data["iss_position"]["latitude"]
-# print(iss_lan)
-# print(iss_long)
+iss_long = float(iss_pos_data["iss_position"]["longitude"])
+iss_lan = float(iss_pos_data["iss_position"]["latitude"])
+print(iss_lan)
+print(iss_long)
 
 # will send the mail to user only in the condition that time is in between sunset and sunrise hour and ISS is excatly
 # over the head of person on the basis of his live location which we get as an input
-
-if current_hour <= sunrise_hour_int or current_hour >= sunset_hour_int:
-    if iss_long == My_long and iss_lan == My_lat:
-        send_mail()
+a = 1
+while True:
+    time.sleep(10)
+    if current_hour <= sunrise_hour_int or current_hour >= sunset_hour_int:
+        if -5 <= iss_long-My_long <= 5 and -5 <= iss_lan-My_lat <= 5:
+            print("True")
+        # if iss_long == My_long and iss_lan == My_lat:
+            send_mail()
