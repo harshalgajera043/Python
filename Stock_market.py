@@ -17,7 +17,7 @@ STOCK = "TSLA"
 COMPANY_NAME = "Tesla Inc"
 
 # AVS_API_KEY = os.environ.get("API_KEY")
-AVS_API_KEY = "K6JFQGSQL3Z7M2D4"
+AVS_API_KEY = "K6JFQGSge3Z7M2D4"
 AVS_API_ENDPOINT = "https://www.alphavantage.co/query"
 
 PARAMETERS = {
@@ -39,7 +39,7 @@ if daily_change_percentage >= 0.8 or daily_change_percentage <= -5:
 
     # -----------------------  API TO CREATE NEWS  -----------------------#
 
-    NEWS_API_KEY = "46f2a5942f5f492cb56b1e46bb1f99f7"
+    NEWS_API_KEY = "46f2a5942f54sd2cb56b1346b21f99f7"
     NEWS_API_ENDPOINT = "https://newsapi.org/v2/everything"
 
     NEWS_PARAMETERS = {
@@ -63,9 +63,9 @@ if daily_change_percentage >= 0.8 or daily_change_percentage <= -5:
         # \nor\nHeadline: {news_list_headlines[1]}\nBrief: {news_list_description[1]}\nor\nHeadline: {news_list_headlines[2]}\nBrief: {news_list_description[2]}"
 
     # ------------------------  SMTP TO SEND THE MAIL RELATED TO CHANGE  ------------------------#
-    from_id = "hgajera307@gmail.com"
-    receive_id = "hgajera65@gmail.com"
-    password = "znxbjxstkvuwkizz"
+    from_id = "hgaje07@gmail.com"
+    receive_id = "hgaje45@gmail.com"
+    password = "znxbjx45bfvusvkiz"
 
     send_mail = SMTP("smtp.gmail.com", 587)
     send_mail.starttls()
