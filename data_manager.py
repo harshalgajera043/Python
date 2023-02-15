@@ -1,58 +1,30 @@
-import requests
-from flight_search import FlightSearch
-from flight_data import FlightData
 from pprint import pprint
+import requests
+
+SHEETY_PRICES_ENDPOINT = "https://api.sheety.co/7b478f6d9aaf388ebd365e03b4ec6f7e/flightDeals/prices"
+
 
 class DataManager:
 
     def __init__(self):
-        self.my_flight = FlightSearch()
-        self.cheap_flight = FlightData()
-        self.Tequila_api_key = "cShzhQu2PchVn-qZ_f64hRbmxK06Tfvv"
-        self.sheety_api_key = "Bearer asfojJihNF874&HJ@xwji2vasc214*&23"
-        self.sheety_api_endpoint = "https://api.sheety.co/da01725c6ec4a96c30c5a6da1f0f92f7/flightDeals/prices"
-        self.parameter = {
-            "Authorization": self.sheety_api_key
-        }
+        self.destination_data = {}
 
-    def sheet_data(self, city_name, lower_price):
+    def get_destination_data(self):
+        response = requests.get(url=SHEETY_PRICES_ENDPOINT)
+        data = response.json()
+        print(data)
+        self.destination_data = data["prices"]
+        return self.destination_data
 
-        self.add_city = {
-            "price": {
-                "city": f"{city_name}",
-                "iataCode": "",
-                "lowestPrice": lower_price
-            }
-        }
-
-        # self.post_city = requests.post(url=self.sheety_api_endpoint, headers=self.parameter, json=self.add_city).json()
-        self.response = requests.get(url=self.sheety_api_endpoint, headers=self.parameter, json=self.add_city).json()
-        print(self.response)
-        self.city = self.response["prices"]
-        return self.response
-
-    def change_detail(self):
-        for i in range(len(self.city)):
-            self.flight_code = self.my_flight.flight_code(self.city[i]["city"])
-            self.lowest_price = self.city[i]["lowestPrice"]
-            update = {
+    def update_destination_codes(self):
+        for city in self.destination_data:
+            new_data = {
                 "price": {
-                    "iataCode": f"{self.flight_code}"
+                    "iataCode": city["iataCode"]
                 }
             }
-            # print(i)
-            if self.city[i]["iataCode"] == "":
-                self.id = self.city[i]["id"]
-                self.sheeety_put_api = f"{self.sheety_api_endpoint}/{self.id}"
-                print(self.response["prices"][i]["id"])
-                self.updated_response = requests.put(url=self.sheeety_put_api, headers=self.parameter, json=update)
-            self.look_for_trip(self.flight_code, self.lowest_price)
-        self.final_response = requests.get(url=self.sheety_api_endpoint, headers=self.parameter, json=self.add_city).json()
-        # print(self.final_response)
-        return self.final_response
-
-
-    def look_for_trip(self, flight_code, lowest_price):
-        self.cheap_flight.trip(flight_code, lowest_price)
-
-
+            response = requests.put(
+                url=f"{SHEETY_PRICES_ENDPOINT}/{city['id']}",
+                json=new_data
+            )
+            print(response.text)
