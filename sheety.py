@@ -1,54 +1,36 @@
 import requests
-from datetime import datetime
-import os
 
-GENDER = "MALE"
-WEIGHT_KG = "66.2"
-HEIGHT_CM = "178"
-AGE = "20"
+sheety_endpoint = "https://api.sheety.co/7b478f6d9aaf388ebd365e03b4ec6f7e/userData/sheet1"
 
-APP_ID = "99ee7f90"
-API_KEY = "a8c04761f136bccd7a7e02565cfaeb10"
+class User_login:
 
-exercise_endpoint = "https://trackapi.nutritionix.com/v2/natural/exercise"
-sheet_endpoint = "https://api.sheety.co/9cca9b70217c9fe19a71830df073d27e/myWorkouts/workouts"
+    # get to log-in
+    def login(self, username, password):
+        details = requests.get(url=sheety_endpoint)
+        sheet_entries = details.json()["sheet1"]
+        for i in range(0, len(sheet_entries)):
+            if sheet_entries[i]["firstName"] == username and sheet_entries[i]["password"] == password:
+                print("You have access")
+            # else:
+            #     print("Sorry no access")
 
-exercise_text = input("Tell me which exercises you did: ")
+    # put to change the password of already existing user
+    def reset_password(self, username, password):
+        details = requests.get(url=sheety_endpoint)
+        sheet_entries = details.json()["sheet1"]
+        quary = {"sheet1": {"password": password}}
+        for i in range(0, len(sheet_entries)):
+            put_url = f"{sheet_entries}/{sheet_entries[i]['id']}"
+            if sheet_entries[i]["firstName"] == username:
+                new_password_request = requests.put(url=put_url, data=quary)
+                print(new_password_request.json())
+                print("Password change Successfully")
 
-headers = {
-    "x-app-id": APP_ID,
-    "x-app-key": API_KEY,
-}
 
-parameters = {
-    "query": exercise_text,
-    "gender": GENDER,
-    "weight_kg": WEIGHT_KG,
-    "height_cm": HEIGHT_CM,
-    "age": AGE
-}
+    # post for new Sing up
 
-response = requests.post(exercise_endpoint, json=parameters, headers=headers)
-result = response.json()
+    def create_account(self, details):
+        new_account = requests.post(url=sheety_endpoint, json=details)
+        print(new_account)
 
-today_date = datetime.now().strftime("%d/%m/%Y")
-now_time = datetime.now().strftime("%X")
 
-bearer_headers = {
-    "Authorization": f"Bearer fkrerkfwefkjhitjbdkqwknkrk"
-}
-
-for exercise in result["exercises"]:
-    sheet_inputs = {
-        "workout": {
-            "date": today_date,
-            "time": now_time,
-            "exercise": exercise["name"].title(),
-            "duration": exercise["duration_min"],
-            "calories": exercise["nf_calories"]
-        }
-    }
-
-    sheet_response = requests.post(sheet_endpoint, json=sheet_inputs, headers=bearer_headers)
-
-    print(sheet_response.text)
