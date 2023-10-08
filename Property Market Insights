@@ -1,0 +1,42 @@
+# Import necessary libraries
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+
+# Step 1: Load the real estate data from a CSV file
+data = pd.read_csv('real_estate_data.csv')
+
+# Step 2: Clean the data by removing rows with missing information
+data = data.dropna()
+
+# Step 3: Explore the data visually by plotting property size against property price
+plt.scatter(data['PropertySize'], data['PropertyPrice'])
+plt.xlabel('Property Size (sq ft)')
+plt.ylabel('Property Price ($)')
+plt.title('Property Size vs. Price')
+plt.show()
+
+# Step 4: Segment the data by property type (e.g., apartment, house, condo) and summarize each segment
+property_types = data['PropertyType'].unique()
+for p_type in property_types:
+    subset = data[data['PropertyType'] == p_type]
+    print(f'Segment: {p_type}')
+    print(subset.describe())
+
+# Step 5: Build a predictive model to estimate property prices using Linear Regression
+X = data[['PropertySize']]
+y = data['PropertyPrice']
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Create and train a Linear Regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Step 6: Evaluate the model's performance using Mean Squared Error
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+print(f'Mean Squared Error: {mse}')
